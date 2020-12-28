@@ -1,58 +1,72 @@
 #ifndef C_HASH_TABLE
 #define C_HASH_TABLE
 
-#include <list>
+#include <map>
 
 #define HASH_DEFAULT_SIZE 10
 
 //separate Chaining for collision handling
-template <typename T>
+template <typename K,typename D>
 class CHashTable {
 public:
-	CHashTable(size_t(*Hfunction)(T const& e), size_t size = HASH_DEFAULT_SIZE);
+	CHashTable(size_t(*Hfunction)(K const& key), size_t size = HASH_DEFAULT_SIZE);
 
-	bool insert(T e);
+	bool insert(K const& key, D data);
 
-	void erase(T e);
+	bool full() const;
 
-	void Traverse(void visit(T& e));
+	void erase(K const& key);
+
+	D get(K const& key) const;
+
+	void Traverse(void visit(K key, D data));
 
 private:
 	size_t size;
-	size_t(*Hfunction)(T const& e);
-	std::list<T>* HTable;
+	size_t curr_size;
+	size_t(*Hfunction)(K const& e);
+	std::map<K, D>* HTable;
 };
 
-template<typename T>
-CHashTable<T>::CHashTable(size_t(*Hfunction)(T const& e), size_t size)
-	: Hfunction(Hfunction), size(size) {
-	HTable = new std::list<T>[size];
+template<typename K, typename D>
+inline CHashTable<K, D>::CHashTable(size_t(*Hfunction)(K const& key), size_t size)
+	: Hfunction(Hfunction), size(size), curr_size(0) {
+		HTable = new std::map<K, D>[size];
 }
 
-
-template<typename T>
-bool CHashTable<T>::insert(T e) {
-	size_t index = Hfunction(e);
-	if (index >= size)
+template<typename K, typename D>
+inline bool CHashTable<K, D>::insert(K const& key, D data) {
+	size_t index = Hfunction(key);
+	if (index >= size || full())
 		return false;
-	HTable[index].push_back(e);
+	std::map<int, int> m;
+	HTable[index].insert(std::pair<K, D>(key, data));
+	curr_size++;
 	return true;
 }
 
-template<typename T>
-void CHashTable<T>::erase(T e) {
-	size_t index = Hfunction(e);
-	for(size_t i = 0; i < HTable[i].size();i++)
-		if (HTable[i] == e)
-			HTable[i].erase(i);
+template<typename K, typename D>
+inline bool CHashTable<K, D>::full() const {
+	return size == curr_size;
 }
 
-template<typename T>
-void CHashTable<T>::Traverse(void visit(T& e)) {
+template<typename K, typename D>
+inline void CHashTable<K, D>::erase(K const& key) {
+	size_t index = Hfunction(key);
+	HTable[index].erase(key);
+	curr_size--;
+}
+template<typename K, typename D>
+inline D CHashTable<K, D>::get(K const& key) const {
+	size_t index = Hfunction(key);
+	return HTable[index].find(key)->second;
+}
+
+template<typename K, typename D>
+inline void CHashTable<K, D>::Traverse(void visit(K key, D data)) {
 	for (size_t i = 0; i < size; i++)
-		for (auto& j : HTable[i])
-			visit(j);
+		for (auto j : HTable[i])
+			visit(j.first, j.second);
 }
 
 #endif // !C_HASH_TABLE
-
