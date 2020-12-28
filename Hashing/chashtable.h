@@ -17,7 +17,7 @@ public:
 
 	void erase(K const& key);
 
-	D get(K const& key) const;
+	D& operator[](K const& key);
 
 	void Traverse(void visit(K key, D data));
 
@@ -56,8 +56,9 @@ inline void CHashTable<K, D>::erase(K const& key) {
 	HTable[index].erase(key);
 	curr_size--;
 }
+
 template<typename K, typename D>
-inline D CHashTable<K, D>::get(K const& key) const {
+inline D& CHashTable<K, D>::operator[](K const& key) {
 	size_t index = Hfunction(key);
 	return HTable[index].find(key)->second;
 }

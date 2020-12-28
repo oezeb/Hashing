@@ -2,6 +2,7 @@
 #include <string>
 #include <map>
 #include "chashtable.h"
+#include "ahashtable.h"
 
 using namespace std;
 
@@ -15,14 +16,24 @@ void print(string name,int age) {
 }
 
 int main() {
+	int age[] = { 19, 34, 23, 20, 59, 5, 17 };
+	string name[] = { "jake","alex","peter","paul","justin","jade","chris" };
 
-	CHashTable<string,int> Tab(hash0);
-	int age[] = { 84, 34, 23, 999,59, 9,117 };
-	string name[] = { "avs","kjh","weio","jskj","hjhv","qiuw","ouhe" };
+	CHashTable<string,int> CH(hash0);
 	for (int i = 0; i < 7; i++)
-		Tab.insert(name[i], age[i]);
-	Tab.Traverse(print);
-	cout << "avs-->" << Tab.get("avs");
-	//T.display();*/
+		CH.insert(name[i], age[i]);
+	cout << "separate Chaining for collision handling\n";
+	cout << "jake " << CH["jake"] << "\n";
+	cout << "peter " << CH["peter"] << "\n";
+	cout << "paul " << CH["paul"] << "\n\n";
+
+	AHashTable<string, int> AH(hash0);
+	for (int i = 0; i < 7; i++)
+		AH.insert(name[i], age[i]);
+	cout << "open Adressing for collision handling\n";
+	cout << "alex " << CH["alex"] << "\n";
+	cout << "justin " << CH["justin"] << "\n";
+	cout << "jade " << CH["jade"] << "\n";
+	cout << "chris " << CH["chris"] << "\n";
 	return 0;
 }
